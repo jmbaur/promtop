@@ -7,11 +7,12 @@ pkgs.stdenv.mkDerivation {
   pname = "pomtop";
   version = "0.1.0";
   src = builtins.path { path = ./.; };
-  nativeBuildInputs = [ pkgs.ncurses6 zig ];
+  nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+  buildInputs = [ pkgs.ncurses6 zig ];
   preBuild = ''
     export HOME=$TMPDIR
   '';
   installPhase = ''
-    zig build -Drelease-safe -Dcpu=baseline --prefix $out install
+    zig build --prefix $out install
   '';
 }
