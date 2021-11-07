@@ -4,7 +4,7 @@ let
   zig = (import zig-overlay { inherit pkgs system; }).master.latest;
 in
 pkgs.stdenv.mkDerivation {
-  pname = "pomtop";
+  pname = "promtop";
   version = "0.1.0";
   src = builtins.path { path = ./.; };
   nativeBuildInputs = with pkgs; [ autoPatchelfHook ncurses6 ];

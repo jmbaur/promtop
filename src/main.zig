@@ -14,7 +14,7 @@ pub fn main() anyerror!void {
 
     _ = c.start_color();
 
-    _ = c.mvaddstr(0, 0, "PomTop");
+    _ = c.mvaddstr(0, 0, "PromTop");
 
     if (c.has_colors() and c.COLOR_PAIRS >= 13) {
         _ = c.init_pair(1, c.COLOR_RED, c.COLOR_BLACK);

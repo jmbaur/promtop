@@ -11,7 +11,7 @@ pub fn build(b: *std.build.Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
-    const exe = b.addExecutable("pomtop", "src/main.zig");
+    const exe = b.addExecutable("promtop", "src/main.zig");
     exe.linkLibC();
     exe.linkSystemLibrary("ncursesw");
     exe.setTarget(target);
