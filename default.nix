@@ -7,8 +7,8 @@ pkgs.stdenv.mkDerivation {
   pname = "pomtop";
   version = "0.1.0";
   src = builtins.path { path = ./.; };
-  nativeBuildInputs = [ pkgs.autoPatchelfHook ];
-  buildInputs = [ pkgs.ncurses6 zig ];
+  nativeBuildInputs = with pkgs; [ autoPatchelfHook ncurses6 ];
+  buildInputs = [ zig ];
   preBuild = ''
     export HOME=$TMPDIR
   '';
