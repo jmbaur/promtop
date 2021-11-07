@@ -7,7 +7,6 @@ pkgs.stdenv.mkDerivation {
   pname = "promtop";
   version = "0.1.0";
   src = builtins.path { path = ./.; };
-  nativeBuildInputs = with pkgs; [ autoPatchelfHook ncurses6 ];
   buildInputs = [ zig ];
   preBuild = ''
     export HOME=$TMPDIR

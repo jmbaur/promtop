@@ -12,8 +12,6 @@ pub fn build(b: *std.build.Builder) void {
     const mode = b.standardReleaseOptions();
 
     const exe = b.addExecutable("promtop", "src/main.zig");
-    exe.linkLibC();
-    exe.linkSystemLibrary("ncursesw");
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
