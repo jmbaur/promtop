@@ -11,9 +11,7 @@ const OutputError = error{
     WinSizeError,
 };
 
-const max = 1 << 8;
-
-const bounded_row = std.BoundedArray(u8, max);
+const max = 1 << 16;
 
 pub fn main() anyerror!void {
     const handle = try os.open("/dev/stdout", os.O.RDONLY, 0);
@@ -29,42 +27,45 @@ pub fn main() anyerror!void {
         return OutputError.WinSizeError;
     }
 
-    var buffer: [max * max]u8 = undefined;
+    const height = wsz.ws_row;
+    const width = wsz.ws_col;
+
+    var buffer: [max]u8 = undefined;
     const allocator = &std.heap.FixedBufferAllocator.init(&buffer).allocator;
-    const rows = try allocator.alloc(bounded_row, wsz.ws_row + 1);
-    defer allocator.free(rows);
+    const window = try allocator.alloc(u8, width * height);
+    defer allocator.free(window);
 
-    var x: u16 = undefined;
-    var y: u16 = undefined;
-
-    y = 0;
-    while (y < rows.len) {
-        const cols = try bounded_row.init(wsz.ws_col + 1);
-        rows[y] = cols;
-        y += 1;
+    // Default to empty cells
+    for (window) |_, idx| {
+        window[idx] = ' ';
     }
 
+    // Fill program title
     for ("PromTop") |char, idx| {
-        rows[1].set(idx + 1, char);
+        window[idx] = char;
     }
 
-    x = 0;
-    while (x < wsz.ws_col) {
-        rows[2].set(x + 1, '-');
-        rows[rows.len - 1].set(x + 1, '-');
-        x += 1;
+    // Fill line break with dashes
+    {
+        const start = width;
+        const end = start + width;
+        var x: u16 = start;
+        while (x < end) {
+            window[x] = '-';
+            x += 1;
+        }
     }
 
     vt100.clearscreen();
-
     while (true) {
         // Draw to screen
-        for (rows) |cols, row_idx| {
-            for (cols.constSlice()) |cell, col_idx| {
-                vt100.cursorpos(row_idx, col_idx);
-                print("{c}", .{cell});
-            }
+        for (window) |cell, idx| {
+            const x = idx % width + 1;
+            const y = @divFloor(idx, width) + 1;
+            vt100.cursorpos(y, x);
+            print("{c}", .{cell});
         }
+
         time.sleep(time.ns_per_s * 10);
     }
 }
