@@ -1,15 +1,15 @@
 const print = @import("std").debug.print;
 
-pub const setnl = "\x1B[20h"; // LMN             Set new line mode
-pub const setappl = "\x1B[?1h"; // DECCKM        Set cursor key to application
-pub const setansi = "none"; // DECANM        Set ANSI (versus VT52)
-pub const setcol = "\x1B[?3h"; // DECCOLM        Set number of columns to 132
-pub const setsmooth = "\x1B[?4h"; // DECSCLM     Set smooth scrolling
-pub const setrevscrn = "\x1B[?5h"; // DECSCNM    Set reverse video on screen
-pub const setorgrel = "\x1B[?6h"; // DECOM       Set origin to relative
-pub const setwrap = "\x1B[?7h"; // DECAWM        Set auto-wrap mode
-pub const setrep = "\x1B[?8h"; // DECARM         Set auto-repeat mode
-pub const setinter = "\x1B[?9h"; // DECINLM      Set interlacing mode
+// pub const setnl = "\x1B[20h"; // LMN             Set new line mode
+// pub const setappl = "\x1B[?1h"; // DECCKM        Set cursor key to application
+// pub const setansi = "none"; // DECANM        Set ANSI (versus VT52)
+// pub const setcol = "\x1B[?3h"; // DECCOLM        Set number of columns to 132
+// pub const setsmooth = "\x1B[?4h"; // DECSCLM     Set smooth scrolling
+// pub const setrevscrn = "\x1B[?5h"; // DECSCNM    Set reverse video on screen
+// pub const setorgrel = "\x1B[?6h"; // DECOM       Set origin to relative
+// pub const setwrap = "\x1B[?7h"; // DECAWM        Set auto-wrap mode
+// pub const setrep = "\x1B[?8h"; // DECARM         Set auto-repeat mode
+// pub const setinter = "\x1B[?9h"; // DECINLM      Set interlacing mode
 
 // pub const setlf = "\x1B[20l"; // LMN             Set line feed mode
 // pub const setcursor = "\x1B[?1l"; // DECCKM      Set cursor key to cursor
@@ -25,23 +25,12 @@ pub const setinter = "\x1B[?9h"; // DECINLM      Set interlacing mode
 // pub const altkeypad = "\x1B="; // DECKPAM     Set alternate keypad mode
 // pub const numkeypad = "\x1B>"; // DECKPNM     Set numeric keypad mode
 
-// pub const setukg0 = "\x1B(A"; //               Set United Kingdom G0 character set
-// pub const setukg1 = "\x1B)A"; //               Set United Kingdom G1 character set
-// pub const setusg0 = "\x1B(B"; //               Set United States G0 character set
-// pub const setusg1 = "\x1B)B"; //               Set United States G1 character set
-// pub const setspecg0 = "\x1B(0"; //             Set G0 special chars. & line set
-// pub const setspecg1 = "\x1B)0"; //             Set G1 special chars. & line set
-// pub const setaltg0 = "\x1B(1"; //              Set G0 alternate character ROM
-// pub const setaltg1 = "\x1B)1"; //              Set G1 alternate character ROM
-// pub const setaltspecg0 = "\x1B(2"; //          Set G0 alt char ROM and spec. graphics
-// pub const setaltspecg1 = "\x1B)2"; //          Set G1 alt char ROM and spec. graphics
-
 // pub const setss2 = "\x1BN"; // SS2            Set single shift 2
 // pub const setss3 = "\x1BO"; // SS3            Set single shift 3
 
 // pub const modesoff = "\x1B[m"; // SGR0         Turn off character attributes
 // pub const modesoff = "\x1B[0m"; // SGR0         Turn off character attributes
-// pub const bold = "\x1B[1m"; // SGR1             Turn bold mode on
+pub const bold = "\x1B[1m"; // SGR1             Turn bold mode on
 // pub const lowint = "\x1B[2m"; // SGR2           Turn low intensity mode on
 // pub const underline = "\x1B[4m"; // SGR4        Turn underline mode on
 // pub const blink = "\x1B[5m"; // SGR5            Turn blinking mode on
@@ -50,16 +39,22 @@ pub const setinter = "\x1B[?9h"; // DECINLM      Set interlacing mode
 
 // pub const setwin = "\x1B[<v>;<v>r"; // DECSTBM        Set top and bottom line#s of a window
 
-pub const cursorup = "\x1B[01A"; //(n) CUU       Move cursor up n lines
-pub const cursordn = "\x1B[10B"; //(n) CUD       Move cursor down n lines
+pub fn cursorup(n: usize) void {
+    print("\x1B[{0d:0>2}A", .{n}); //(n) CUU       Move cursor up n lines
+}
+
+pub fn cursordn(n: usize) void {
+    print("\x1B[{0d:0>2}B", .{n}); //(n) CUD       Move cursor down n lines
+}
+
 // pub const cursorrt = "\x1B[<n>C"; //(n) CUF       Move cursor right n lines
 // pub const cursorlf = "\x1B[<n>D"; //(n) CUB       Move cursor left n lines
 // pub const cursorhome = "\x1B[H"; //            Move cursor to upper left corner
 // pub const cursorhome = "\x1B[;H"; //            Move cursor to upper left corner
 
 //(v,h) CUP    Move cursor to screen location v,h
-pub fn cursorpos(v: u64, h: u64) void {
-    print("\x1B[{d};{d}H", .{ v, h });
+pub fn cursorpos(v: usize, h: usize) void {
+    print("\x1B[{0d:0>2};{1d:0>2}H", .{ v, h });
 }
 
 // pub const hvhome = "\x1B[f"; //                Move cursor to upper left corner
