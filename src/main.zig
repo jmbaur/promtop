@@ -59,11 +59,17 @@ pub fn main() anyerror!void {
     vt100.clearscreen();
     while (true) {
         // Draw to screen
-        for (window) |cell, idx| {
-            const x = idx % width + 1;
-            const y = @divFloor(idx, width) + 1;
+        var x: u16 = 1;
+        var y: u16 = 1;
+        for (window) |cell| {
             vt100.cursorpos(y, x);
             print("{c}", .{cell});
+            if (x < width) {
+                x += 1;
+            } else {
+                x = 1;
+                y += 1;
+            }
         }
 
         time.sleep(time.ns_per_s * 10);

@@ -53,6 +53,7 @@ pub fn cursordn(n: usize) void {
 // pub const cursorhome = "\x1B[;H"; //            Move cursor to upper left corner
 
 //(v,h) CUP    Move cursor to screen location v,h
+// Positions are one-indexed
 pub fn cursorpos(v: usize, h: usize) void {
     print("\x1B[{0d:0>2};{1d:0>2}H", .{ v, h });
 }
