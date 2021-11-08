@@ -45,9 +45,19 @@ pub fn main() anyerror!void {
         window[idx] = char;
     }
 
-    // Fill line break with dashes
+    // Fill top line break with dashes
     {
         const start = width;
+        const end = start + width;
+        var x: u16 = start;
+        while (x < end) {
+            window[x] = '-';
+            x += 1;
+        }
+    }
+    // Fill bottom line break with dashes
+    {
+        const start = height * width - width;
         const end = start + width;
         var x: u16 = start;
         while (x < end) {
