@@ -1,5 +1,6 @@
 const std = @import("std");
 const linux = std.os.linux;
+const math = std.math;
 const os = std.os;
 const print = std.debug.print;
 const time = std.time;
@@ -12,6 +13,50 @@ const OutputError = error{
 };
 
 const max = 1 << 16;
+
+const Widget = struct {
+    start_x: u16,
+    start_y: u16,
+    width: u16,
+    height: u16,
+    buffer: []u8,
+    pub fn init(
+        allocator: *std.mem.Allocator,
+        x: u16,
+        y: u16,
+        width: u16,
+        height: u16,
+        default_value: u8,
+    ) !@This() {
+        var buf = try allocator.alloc(u8, width * height);
+        // Default to empty cell.
+        for (buf) |*cell| {
+            cell.* = default_value;
+        }
+        var widget = @This(){
+            .start_x = x,
+            .start_y = y,
+            .width = width,
+            .height = height,
+            .buffer = buf,
+        };
+        return widget;
+    }
+    pub fn draw(self: @This()) void {
+        var x: u16 = self.start_x;
+        var y: u16 = self.start_y;
+        for (self.buffer) |cell| {
+            vt100.cursorpos(y, x);
+            print("{c}", .{cell});
+            if (x < self.width) {
+                x += 1;
+            } else {
+                x = 1;
+                y += 1;
+            }
+        }
+    }
+};
 
 pub fn main() anyerror!void {
     const handle = try os.open("/dev/stdout", os.O.RDONLY, 0);
@@ -35,53 +80,19 @@ pub fn main() anyerror!void {
     const window = try allocator.alloc(u8, width * height);
     defer allocator.free(window);
 
-    // Default to empty cells
-    for (window) |_, idx| {
-        window[idx] = ' ';
-    }
-
-    // Fill program title
+    const title = try Widget.init(allocator, 1, 1, width, 1, ' ');
     for ("PromTop") |char, idx| {
-        window[idx] = char;
+        title.buffer[idx] = char;
     }
 
-    // Fill top line break with dashes
-    {
-        const start = width;
-        const end = start + width;
-        var x: u16 = start;
-        while (x < end) {
-            window[x] = '-';
-            x += 1;
-        }
-    }
-    // Fill bottom line break with dashes
-    {
-        const start = height * width - width;
-        const end = start + width;
-        var x: u16 = start;
-        while (x < end) {
-            window[x] = '-';
-            x += 1;
-        }
-    }
+    const top_line_break = try Widget.init(allocator, 1, 2, width, 1, '-');
+    const bottom_line_break = try Widget.init(allocator, 1, height, width, 1, '-');
 
     vt100.clearscreen();
     while (true) {
-        // Draw to screen
-        var x: u16 = 1;
-        var y: u16 = 1;
-        for (window) |cell| {
-            vt100.cursorpos(y, x);
-            print("{c}", .{cell});
-            if (x < width) {
-                x += 1;
-            } else {
-                x = 1;
-                y += 1;
-            }
-        }
-
+        title.draw();
+        top_line_break.draw();
+        bottom_line_break.draw();
         time.sleep(time.ns_per_s * 10);
     }
 }

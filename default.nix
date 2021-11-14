@@ -1,9 +1,10 @@
 { pkgs ? import <nixpkgs> { }, system ? builtins.currentSystem }:
+with pkgs;
 let
   zig-overlay = builtins.fetchTarball "https://github.com/arqv/zig-overlay/archive/main.tar.gz";
   zig = (import zig-overlay { inherit pkgs system; }).master.latest;
 in
-pkgs.stdenv.mkDerivation {
+stdenv.mkDerivation {
   pname = "promtop";
   version = "0.1.0";
   src = builtins.path { path = ./.; };
