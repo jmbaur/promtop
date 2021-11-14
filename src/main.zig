@@ -29,7 +29,6 @@ const Widget = struct {
         default_value: u8,
     ) !@This() {
         var buf = try allocator.alloc(u8, width * height);
-        // Default to empty cell.
         for (buf) |*cell| {
             cell.* = default_value;
         }
