@@ -14,40 +14,39 @@ const OutputError = error{
 
 const max = 1 << 16;
 
+const Size = struct { width: u16, height: u16 };
+
 const Widget = struct {
     start_x: u16,
     start_y: u16,
-    width: u16,
-    height: u16,
+    size: Size,
     buffer: []u8,
     pub fn init(
         allocator: *std.mem.Allocator,
         x: u16,
         y: u16,
-        width: u16,
-        height: u16,
+        size: Size,
         default_value: u8,
     ) !@This() {
-        var buf = try allocator.alloc(u8, width * height);
+        var buf = try allocator.alloc(u8, size.width * size.height);
         for (buf) |*cell| {
             cell.* = default_value;
         }
         var widget = @This(){
             .start_x = x,
             .start_y = y,
-            .width = width,
-            .height = height,
+            .size = size,
             .buffer = buf,
         };
         return widget;
     }
     pub fn draw(self: @This()) void {
-        var x: u16 = self.start_x;
-        var y: u16 = self.start_y;
+        var x: u16 = 1;
+        var y: u16 = 1;
         for (self.buffer) |cell| {
-            vt100.cursorpos(y, x);
+            vt100.cursorpos(y + self.start_y, x + self.start_x);
             print("{c}", .{cell});
-            if (x < self.width) {
+            if (x < self.size.width) {
                 x += 1;
             } else {
                 x = 1;
@@ -57,7 +56,7 @@ const Widget = struct {
     }
 };
 
-pub fn main() anyerror!void {
+fn win_size() !Size {
     const handle = try os.open("/dev/stdout", os.O.RDONLY, 0);
 
     if (!os.isatty(handle)) {
@@ -71,26 +70,30 @@ pub fn main() anyerror!void {
         return OutputError.WinSizeError;
     }
 
-    const height = wsz.ws_row;
-    const width = wsz.ws_col;
+    return Size{ .height = wsz.ws_row, .width = wsz.ws_col };
+}
+
+pub fn main() anyerror!void {
+    const wsz = try win_size();
 
     var buffer: [max]u8 = undefined;
     const allocator = &std.heap.FixedBufferAllocator.init(&buffer).allocator;
-    const window = try allocator.alloc(u8, width * height);
-    defer allocator.free(window);
 
-    const title = try Widget.init(allocator, 1, 1, width, 1, ' ');
+    const title = try Widget.init(allocator, 0, 0, Size{ .width = wsz.width, .height = 1 }, ' ');
     for ("PromTop") |char, idx| {
         title.buffer[idx] = char;
     }
 
-    const top_line_break = try Widget.init(allocator, 1, 2, width, 1, '-');
-    const bottom_line_break = try Widget.init(allocator, 1, height, width, 1, '-');
+    const top_line_break = try Widget.init(allocator, 0, 1, Size{ .width = wsz.width, .height = 1 }, '-');
+    const bottom_line_break = try Widget.init(allocator, 0, wsz.height - 1, Size{ .width = wsz.width, .height = 1 }, '-');
+
+    const middle_line_break = try Widget.init(allocator, (wsz.width / 2) - 1, 2, Size{ .width = 1, .height = wsz.height - 3 }, '|');
 
     vt100.clearscreen();
     while (true) {
         title.draw();
         top_line_break.draw();
+        middle_line_break.draw();
         bottom_line_break.draw();
         time.sleep(time.ns_per_s * 10);
     }
