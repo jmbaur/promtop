@@ -104,7 +104,7 @@ pub fn main() anyerror!void {
     const allocator = &std.heap.FixedBufferAllocator.init(&buffer).allocator;
 
     var title = try Widget.init(allocator, 0, 0, Size{ .width = wsz.width, .height = 1 }, -1, ' ');
-    title.update("Proxmox");
+    title.update("PromTop");
 
     var top_line_break = try Widget.init(allocator, 0, 1, Size{ .width = wsz.width, .height = 1 }, -1, '-');
     var middle_line_partition = try Widget.init(allocator, (wsz.width / 2) - 1, 2, Size{ .width = 1, .height = wsz.height - 3 }, -1, '|');
