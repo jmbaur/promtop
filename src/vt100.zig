@@ -1,4 +1,6 @@
-const print = @import("std").debug.print;
+const std = @import("std");
+
+const stdout = std.io.getStdOut().writer();
 
 // pub const setnl = "\x1B[20h"; // LMN             Set new line mode
 // pub const setappl = "\x1B[?1h"; // DECCKM        Set cursor key to application
@@ -40,11 +42,11 @@ pub const bold = "\x1B[1m"; // SGR1             Turn bold mode on
 // pub const setwin = "\x1B[<v>;<v>r"; // DECSTBM        Set top and bottom line#s of a window
 
 pub fn cursorup(n: usize) void {
-    print("\x1B[{0d:0>2}A", .{n}); //(n) CUU       Move cursor up n lines
+    stdout.print("\x1B[{0d:0>2}A", .{n}) catch {}; //(n) CUU       Move cursor up n lines
 }
 
 pub fn cursordn(n: usize) void {
-    print("\x1B[{0d:0>2}B", .{n}); //(n) CUD       Move cursor down n lines
+    stdout.print("\x1B[{0d:0>2}B", .{n}) catch {}; //(n) CUD       Move cursor down n lines
 }
 
 // pub const cursorrt = "\x1B[<n>C"; //(n) CUF       Move cursor right n lines
@@ -55,7 +57,7 @@ pub fn cursordn(n: usize) void {
 //(v,h) CUP    Move cursor to screen location v,h
 // Positions are one-indexed
 pub fn cursorpos(v: usize, h: usize) void {
-    print("\x1B[{0d:0>2};{1d:0>2}H", .{ v, h });
+    stdout.print("\x1B[{0d:0>2};{1d:0>2}H", .{ v, h }) catch {};
 }
 
 // pub const hvhome = "\x1B[f"; //                Move cursor to upper left corner
@@ -87,7 +89,7 @@ pub const cleareos = "\x1B[J"; // ED0          Clear screen from cursor down
 pub const clearbos = "\x1B[1J"; // ED1          Clear screen from cursor up
 
 pub fn clearscreen() void {
-    print("\x1B[2J", .{}); // ED2       Clear entire screen
+    stdout.print("\x1B[2J", .{}) catch {}; // ED2       Clear entire screen
 }
 
 // pub const devstat = "\x1B5n"; // DSR           Device status report
