@@ -1,5 +1,6 @@
 const std = @import("std");
 const io = std.io;
+const log = std.log;
 const linux = std.os.linux;
 const math = std.math;
 const os = std.os;
@@ -25,7 +26,7 @@ const Widget = struct {
     size: Size,
     buffer: []u8,
     update_interval: i8,
-    last_updated: u8,
+    last_updated: u4,
     drawn: bool,
     pub fn init(
         allocator: *std.mem.Allocator,
@@ -120,38 +121,43 @@ pub fn main() anyerror!void {
         if (!title.drawn or title.last_updated == title.update_interval) {
             title.last_updated = 0;
             title.drawn = true;
-            print("Updating title\n", .{});
+            log.info("Updating title", .{});
             resume title_frame;
-        } else {
+        } else if (title.update_interval >= 0) {
+            log.info("Incrementing title.last_updated", .{});
             title.last_updated += 1;
         }
+
         if (!top_line_break.drawn or top_line_break.last_updated == top_line_break.update_interval) {
             top_line_break.last_updated = 0;
             top_line_break.drawn = true;
-            print("Updating TLB\n", .{});
+            log.info("Updating TLB", .{});
             resume tlb_frame;
-        } else {
+        } else if (top_line_break.update_interval >= 0) {
+            log.info("Incrementing top_line_break.last_updated", .{});
             top_line_break.last_updated += 1;
         }
         if (!middle_line_partition.drawn or middle_line_partition.last_updated == middle_line_partition.update_interval) {
             middle_line_partition.last_updated = 0;
             middle_line_partition.drawn = true;
-            print("Updating MLP\n", .{});
+            log.info("Updating MLP", .{});
             resume mlp_frame;
-        } else {
+        } else if (middle_line_partition.update_interval >= 0) {
+            log.info("Incrementing middle_line_partition.last_updated", .{});
             middle_line_partition.last_updated += 1;
         }
         if (!bottom_line_break.drawn or bottom_line_break.last_updated == bottom_line_break.update_interval) {
             bottom_line_break.last_updated = 0;
             bottom_line_break.drawn = true;
-            print("Updating BLB\n", .{});
+            log.info("Updating BLB", .{});
             resume blb_frame;
-        } else {
+        } else if (bottom_line_break.update_interval >= 0) {
+            log.info("Incrementing bottom_line_break.last_updated", .{});
             bottom_line_break.last_updated += 1;
         }
         // Place cursor at bottom right after each draw
         vt100.cursorpos(wsz.height, wsz.width);
-        time.sleep(time.ns_per_s * 1);
+        time.sleep(time.ns_per_ms * 1000);
     }
 }
 
