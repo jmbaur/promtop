@@ -101,8 +101,9 @@ fn win_size() !Size {
 pub fn main() anyerror!void {
     const wsz = try win_size();
 
-    var buffer: [max]u8 = undefined;
-    const allocator = &std.heap.FixedBufferAllocator.init(&buffer).allocator;
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    var allocator = &arena.allocator();
 
     var title = try Widget.init(allocator, 0, 0, Size{ .width = wsz.width, .height = 1 }, -1, ' ');
     title.update("PromTop");
