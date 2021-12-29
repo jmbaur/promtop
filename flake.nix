@@ -7,15 +7,8 @@
   outputs = { self, nixpkgs, flake-utils, zig }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            (self: super: {
-              zig = zig.packages.${system}.master.latest;
-            })
-          ];
-        };
-        buildInputs = [ pkgs.zig ];
+        pkgs = import nixpkgs { inherit system; };
+        buildInputs = [ zig.packages.${system}.master.latest ];
       in
       with pkgs; rec {
         devShell = mkShell { inherit buildInputs; };
@@ -32,5 +25,6 @@
           '';
         };
         defaultPackage = packages.promtop;
+        overlay = self: super: { promtop = packages.promtop; };
       });
 }
