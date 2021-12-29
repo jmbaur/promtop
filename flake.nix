@@ -1,8 +1,11 @@
 {
   description = "promtop";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.zig.url = "github:arqv/zig-overlay";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-21.11-small";
+    flake-utils.url = "github:numtide/flake-utils";
+    zig.url = "github:arqv/zig-overlay";
+  };
 
   outputs = { self, nixpkgs, flake-utils, zig }:
     flake-utils.lib.eachDefaultSystem (system:
